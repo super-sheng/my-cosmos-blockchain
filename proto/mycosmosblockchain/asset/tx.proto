@@ -1,0 +1,84 @@
+syntax = "proto3";
+package mycosmosblockchain.asset;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+option go_package = "github.com/super-sheng/my-cosmos-blockchain/x/asset/types";
+
+// 资产消息服务定义
+service Msg {
+  // 创建新资产
+  rpc CreateAsset(MsgCreateAsset) returns (MsgCreateAssetResponse);
+  
+  // 转移资产所有权
+  rpc TransferAsset(MsgTransferAsset) returns (MsgTransferAssetResponse);
+  
+  // 更新资产信息
+  rpc UpdateAsset(MsgUpdateAsset) returns (MsgUpdateAssetResponse);
+  
+  // 删除资产
+  rpc DeleteAsset(MsgDeleteAsset) returns (MsgDeleteAssetResponse);
+}
+
+// 创建资产的消息
+message MsgCreateAsset {
+  string creator = 1;
+  string name = 2;
+  string description = 3;
+  string price = 4;
+}
+
+// 创建资产响应
+message MsgCreateAssetResponse {
+  string id = 1;
+}
+
+// 转移资产所有权的消息
+message MsgTransferAsset {
+  string creator = 1;
+  string id = 2;
+  string new_owner = 3;
+}
+
+// 转移资产响应
+message MsgTransferAssetResponse {
+  bool success = 1;
+}
+
+// 更新资产信息的消息
+message MsgUpdateAsset {
+  string creator = 1;
+  string id = 2;
+  string name = 3;
+  string description = 4;
+  string price = 5;
+}
+
+// 更新资产响应
+message MsgUpdateAssetResponse {
+  bool success = 1;
+}
+
+// 删除资产的消息
+message MsgDeleteAsset {
+  string creator = 1;
+  string id = 2;
+}
+
+// 删除资产响应
+message MsgDeleteAssetResponse {
+  bool success = 1;
+}
+
+// 资产数据结构
+message Asset {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string owner = 4;
+  string price = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
