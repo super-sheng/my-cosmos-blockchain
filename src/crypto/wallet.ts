@@ -3,7 +3,7 @@
  */
 
 import crypto from 'crypto';
-import { sha256 } from './hash';
+import { sha256, hash160 } from './hash';
 import bip39 from 'bip39';
 
 export interface Wallet {
@@ -91,7 +91,7 @@ function generateAddress (publicKey: string): string {
 
   // 然后加上cosmos前缀，这里简化处理
   // 在真正的Cosmos SDK中，地址生成需要更多的步骤，包括对hash进行Bech32编码
-  return 'cosmos' + hash.substring(0, 38);
+  return 'cosmos' + hash.substring(0, 39);  // 修改为39位，以符合45位地址标准
 }
 
 /**
