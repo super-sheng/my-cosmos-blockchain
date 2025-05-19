@@ -20,9 +20,9 @@ export async function initBlockchain(): Promise<void> {
     // 如果不存在区块，创建创世区块
     const genesisBlock = createGenesisBlock();
     await db.saveBlock(genesisBlock);
-    console.log('\u533a\u5757\u94fe\u5df2\u521d\u59cb\u5316\uff0c\u521b\u4e16\u533a\u5757\u5df2\u521b\u5efa');
+    console.log('区块链已初始化，创世区块已创建');
   } else {
-    console.log(`\u533a\u5757\u94fe\u5df2\u52a0\u8f7d\uff0c\u5f53\u524d\u9ad8\u5ea6: ${lastBlock.index}`);
+    console.log(`区块链已加载，当前高度: ${lastBlock.index}`);
   }
 }
 
@@ -31,7 +31,7 @@ export async function getLatestBlock(): Promise<Block> {
   const db = getDB();
   const lastBlock = await db.getLastBlock();
   if (!lastBlock) {
-    throw new Error('\u533a\u5757\u94fe\u672a\u521d\u59cb\u5316');
+    throw new Error('区块链未初始化');
   }
   return lastBlock;
 }
@@ -98,7 +98,7 @@ export async function addToTransactionPool(transaction: Transaction): Promise<bo
   if (transaction.type === TransactionType.TRANSFER) {
     const senderBalance = await db.getBalance(transaction.from);
     if (senderBalance < transaction.amount + transaction.fee) {
-      console.error('\u4f59\u989d\u4e0d\u8db3');
+      console.error('余额不足');
       return false;
     }
   }

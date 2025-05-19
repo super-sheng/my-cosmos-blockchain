@@ -1,15 +1,3 @@
-export interface Transaction {
-  id: string;
-  from: string;
-  to: string;
-  amount: number;
-  timestamp: number;
-  signature: string;
-  publicKey?: string;
-  type: TransactionType;
-  fee: number;
-}
-
 export enum TransactionType {
   TRANSFER = 'TRANSFER',
   MINING_REWARD = 'MINING_REWARD'
@@ -22,6 +10,12 @@ export interface TransactionData {
   timestamp: number;
   type: TransactionType;
   fee: number;
+}
+
+export interface Transaction extends TransactionData {
+  id: string;
+  signature: string;
+  publicKey?: string;
 }
 
 export function createTransactionData(

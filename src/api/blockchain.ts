@@ -1,10 +1,10 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { getBlockchain, getLatestBlock, isBlockchainValid } from '../blockchain/blockchain';
 
 const router = express.Router();
 
 // 获取区块链信息
-router.get('/info', async (req, res) => {
+router.get('/info', async (req: Request, res: Response) => {
   try {
     const lastBlock = await getLatestBlock();
     const isValid = await isBlockchainValid();
@@ -22,7 +22,7 @@ router.get('/info', async (req, res) => {
 });
 
 // 获取所有区块
-router.get('/blocks', async (req, res) => {
+router.get('/blocks', async (req: Request, res: Response) => {
   try {
     const blockchain = await getBlockchain();
     res.json({ blocks: blockchain });
@@ -33,7 +33,7 @@ router.get('/blocks', async (req, res) => {
 });
 
 // 获取特定区块
-router.get('/block/:index', async (req, res) => {
+router.get('/block/:index', async (req: Request, res: Response) => {
   try {
     const index = parseInt(req.params.index);
     
@@ -56,7 +56,7 @@ router.get('/block/:index', async (req, res) => {
 });
 
 // 验证区块链
-router.get('/validate', async (req, res) => {
+router.get('/validate', async (req: Request, res: Response) => {
   try {
     const isValid = await isBlockchainValid();
     res.json({ isValid });

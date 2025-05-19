@@ -68,22 +68,22 @@ export function isValidBlockHash(hash: string, difficulty: number): boolean {
 
 export function isValidNewBlock(newBlock: Block, previousBlock: Block): boolean {
   if (previousBlock.index + 1 !== newBlock.index) {
-    console.error('\u533a\u5757\u7d22\u5f15\u65e0\u6548');
+    console.error('区块索引无效');
     return false;
   }
 
   if (previousBlock.hash !== newBlock.previousHash) {
-    console.error('\u524d\u4e00\u4e2a\u533a\u5757\u7684\u54c8\u5e0c\u503c\u65e0\u6548');
+    console.error('前一个区块的哈希值无效');
     return false;
   }
 
   if (calculateBlockHash(newBlock) !== newBlock.hash) {
-    console.error('\u533a\u5757\u54c8\u5e0c\u503c\u65e0\u6548');
+    console.error('区块哈希值无效');
     return false;
   }
 
   if (!isValidBlockHash(newBlock.hash, newBlock.difficulty)) {
-    console.error('\u533a\u5757\u54c8\u5e0c\u503c\u4e0d\u6ee1\u8db3\u96be\u5ea6\u8981\u6c42');
+    console.error('区块哈希值不满足难度要求');
     return false;
   }
 
