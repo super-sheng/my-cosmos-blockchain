@@ -1,0 +1,6 @@
+node_modules/
+dist/
+blockchain-data/
+.env
+*.log
+.DS_Store
