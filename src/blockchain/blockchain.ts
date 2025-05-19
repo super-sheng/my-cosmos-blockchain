@@ -1,4 +1,4 @@
-import { Block, createGenesisBlock, createNewBlock, calculateBlockHash, isValidNewBlock } from '../models/block';
+import { Block, createGenesisBlock, createNewBlock, isValidNewBlock } from '../models/block';
 import { Transaction, TransactionType, createMiningRewardTransaction } from '../models/transaction';
 import { getDB } from '../storage/db';
 
@@ -12,7 +12,7 @@ const MAX_TRANSACTIONS_PER_BLOCK = 5; // 每个区块最多包含的交易数
 let transactionPool: Transaction[] = [];
 
 // 初始化区块链
-export async function initBlockchain(): Promise<void> {
+export async function initBlockchain (): Promise<void> {
   const db = getDB();
   const lastBlock = await db.getLastBlock();
 
@@ -27,7 +27,7 @@ export async function initBlockchain(): Promise<void> {
 }
 
 // 获取最后一个区块
-export async function getLatestBlock(): Promise<Block> {
+export async function getLatestBlock (): Promise<Block> {
   const db = getDB();
   const lastBlock = await db.getLastBlock();
   if (!lastBlock) {
@@ -37,7 +37,7 @@ export async function getLatestBlock(): Promise<Block> {
 }
 
 // 获取区块链的所有区块
-export async function getBlockchain(): Promise<Block[]> {
+export async function getBlockchain (): Promise<Block[]> {
   const db = getDB();
   const lastBlock = await db.getLastBlock();
   if (!lastBlock) {
@@ -56,13 +56,13 @@ export async function getBlockchain(): Promise<Block[]> {
 }
 
 // 添加新区块到区块链
-export async function addBlock(block: Block): Promise<boolean> {
+export async function addBlock (block: Block): Promise<boolean> {
   const db = getDB();
   const lastBlock = await getLatestBlock();
 
   if (isValidNewBlock(block, lastBlock)) {
     // 更新交易池 - 移除已被包含在区块中的交易
-    transactionPool = transactionPool.filter(tx => 
+    transactionPool = transactionPool.filter(tx =>
       !block.transactions.some(blockTx => blockTx.id === tx.id)
     );
 
@@ -72,7 +72,7 @@ export async function addBlock(block: Block): Promise<boolean> {
         // 转账交易
         const senderBalance = await db.getBalance(tx.from);
         const recipientBalance = await db.getBalance(tx.to);
-        
+
         await db.updateBalance(tx.from, senderBalance - tx.amount - tx.fee);
         await db.updateBalance(tx.to, recipientBalance + tx.amount);
       } else if (tx.type === TransactionType.MINING_REWARD) {
@@ -90,7 +90,7 @@ export async function addBlock(block: Block): Promise<boolean> {
 }
 
 // 添加交易到交易池
-export async function addToTransactionPool(transaction: Transaction): Promise<boolean> {
+export async function addToTransactionPool (transaction: Transaction): Promise<boolean> {
   const db = getDB();
 
   // 验证交易
@@ -110,19 +110,19 @@ export async function addToTransactionPool(transaction: Transaction): Promise<bo
 }
 
 // 获取交易池中的交易
-export function getTransactionPool(): Transaction[] {
+export function getTransactionPool (): Transaction[] {
   return [...transactionPool];
 }
 
 // 生成新区块
-export async function generateNextBlock(minerAddress: string): Promise<Block> {
+export async function generateNextBlock (minerAddress: string): Promise<Block> {
   const lastBlock = await getLatestBlock();
   const nextIndex = lastBlock.index + 1;
-  
+
   // 选择交易池中的交易
   const transactions = transactionPool
     .slice(0, MAX_TRANSACTIONS_PER_BLOCK);
-  
+
   // 添加挖矿奖励交易
   const rewardTx = createMiningRewardTransaction(minerAddress, MINING_REWARD);
   transactions.push(rewardTx);
@@ -143,7 +143,7 @@ export async function generateNextBlock(minerAddress: string): Promise<Block> {
 }
 
 // 根据区块历史调整难度
-async function calculateDifficulty(): Promise<number> {
+async function calculateDifficulty (): Promise<number> {
   const db = getDB();
   const lastBlock = await db.getLastBlock();
   if (!lastBlock) {
@@ -165,7 +165,7 @@ async function calculateDifficulty(): Promise<number> {
   // 计算预期的出块时间和实际出块时间
   const expectedTime = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
   const timeTaken = lastBlock.timestamp - prevAdjustmentBlock.timestamp;
-  
+
   // 调整难度
   if (timeTaken < expectedTime / 2) {
     return lastBlock.difficulty + 1; // 增加难度
@@ -177,23 +177,23 @@ async function calculateDifficulty(): Promise<number> {
 }
 
 // 验证区块链
-export async function isBlockchainValid(): Promise<boolean> {
+export async function isBlockchainValid (): Promise<boolean> {
   const blockchain = await getBlockchain();
-  
+
   for (let i = 1; i < blockchain.length; i++) {
     const currentBlock = blockchain[i];
     const previousBlock = blockchain[i - 1];
-    
+
     if (!isValidNewBlock(currentBlock, previousBlock)) {
       return false;
     }
   }
-  
+
   return true;
 }
 
 // 获取账户余额
-export async function getBalance(address: string): Promise<number> {
+export async function getBalance (address: string): Promise<number> {
   const db = getDB();
   return db.getBalance(address);
 }

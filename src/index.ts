@@ -27,7 +27,7 @@ app.use('/api/blockchain', blockchainRoutes);
 app.use('/api/asset', assetRoutes);
 
 // 首页
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.send('欢迎使用My Cosmos Blockchain');
 });
 
@@ -51,7 +51,7 @@ process.on('uncaughtException', (error) => {
 });
 
 // 处理未处理的Promise拒绝
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason, _) => {
   logger.error(`未处理的Promise拒绝: ${reason}`);
   console.error('未处理的Promise拒绝:', reason);
 });

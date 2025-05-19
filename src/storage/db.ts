@@ -4,28 +4,28 @@ import { Transaction } from '../models/transaction';
 import { Wallet } from '../crypto/wallet';
 
 interface BlockchainDB {
-  getBlock(hash: string): Promise<Block | null>;
-  getBlockByIndex(index: number): Promise<Block | null>;
-  saveBlock(block: Block): Promise<void>;
-  getLastBlock(): Promise<Block | null>;
-  getTransaction(id: string): Promise<Transaction | null>;
-  saveTransaction(tx: Transaction): Promise<void>;
-  getWallet(address: string): Promise<Wallet | null>;
-  saveWallet(wallet: Wallet): Promise<void>;
-  getBalance(address: string): Promise<number>;
-  updateBalance(address: string, amount: number): Promise<void>;
+  getBlock (hash: string): Promise<Block | null>;
+  getBlockByIndex (index: number): Promise<Block | null>;
+  saveBlock (block: Block): Promise<void>;
+  getLastBlock (): Promise<Block | null>;
+  getTransaction (id: string): Promise<Transaction | null>;
+  saveTransaction (tx: Transaction): Promise<void>;
+  getWallet (address: string): Promise<Wallet | null>;
+  saveWallet (wallet: Wallet): Promise<void>;
+  getBalance (address: string): Promise<number>;
+  updateBalance (address: string, amount: number): Promise<void>;
 }
 
 class LevelBlockchainDB implements BlockchainDB {
-  private db: Level;
+  private db: Level<string, Block | string | Transaction | Wallet>;
 
   constructor() {
     this.db = new Level('./blockchain-data', { valueEncoding: 'json' });
   }
 
-  async getBlock(hash: string): Promise<Block | null> {
+  async getBlock (hash: string): Promise<Block | null> {
     try {
-      return await this.db.get(`block:${hash}`);
+      return await this.db.get(`block:${hash}`) as Block;
     } catch (error) {
       if ((error as any).code === 'LEVEL_NOT_FOUND') {
         return null;
@@ -34,10 +34,10 @@ class LevelBlockchainDB implements BlockchainDB {
     }
   }
 
-  async getBlockByIndex(index: number): Promise<Block | null> {
+  async getBlockByIndex (index: number): Promise<Block | null> {
     try {
       const blockHash = await this.db.get(`index:${index}`);
-      return this.getBlock(blockHash);
+      return this.getBlock(blockHash as string);
     } catch (error) {
       if ((error as any).code === 'LEVEL_NOT_FOUND') {
         return null;
@@ -46,7 +46,7 @@ class LevelBlockchainDB implements BlockchainDB {
     }
   }
 
-  async saveBlock(block: Block): Promise<void> {
+  async saveBlock (block: Block): Promise<void> {
     const batch = this.db.batch();
     batch.put(`block:${block.hash}`, block);
     batch.put(`index:${block.index}`, block.hash);
@@ -54,10 +54,10 @@ class LevelBlockchainDB implements BlockchainDB {
     await batch.write();
   }
 
-  async getLastBlock(): Promise<Block | null> {
+  async getLastBlock (): Promise<Block | null> {
     try {
       const lastBlockHash = await this.db.get('lastBlock');
-      return this.getBlock(lastBlockHash);
+      return this.getBlock(lastBlockHash as string);
     } catch (error) {
       if ((error as any).code === 'LEVEL_NOT_FOUND') {
         return null;
@@ -66,9 +66,9 @@ class LevelBlockchainDB implements BlockchainDB {
     }
   }
 
-  async getTransaction(id: string): Promise<Transaction | null> {
+  async getTransaction (id: string): Promise<Transaction | null> {
     try {
-      return await this.db.get(`tx:${id}`);
+      return await this.db.get(`tx:${id}`) as Transaction;
     } catch (error) {
       if ((error as any).code === 'LEVEL_NOT_FOUND') {
         return null;
@@ -77,13 +77,13 @@ class LevelBlockchainDB implements BlockchainDB {
     }
   }
 
-  async saveTransaction(tx: Transaction): Promise<void> {
+  async saveTransaction (tx: Transaction): Promise<void> {
     await this.db.put(`tx:${tx.id}`, tx);
   }
 
-  async getWallet(address: string): Promise<Wallet | null> {
+  async getWallet (address: string): Promise<Wallet | null> {
     try {
-      return await this.db.get(`wallet:${address}`);
+      return await this.db.get(`wallet:${address}`) as Wallet;
     } catch (error) {
       if ((error as any).code === 'LEVEL_NOT_FOUND') {
         return null;
@@ -92,15 +92,15 @@ class LevelBlockchainDB implements BlockchainDB {
     }
   }
 
-  async saveWallet(wallet: Wallet): Promise<void> {
-    await this.db.put(`wallet:${wallet.address}`, wallet);
+  async saveWallet (wallet: Wallet): Promise<void> {
+    await this.db.put(`wallet:${wallet.address}`, wallet as unknown as string);
     // 初始化余额为0
     await this.updateBalance(wallet.address, 0);
   }
 
-  async getBalance(address: string): Promise<number> {
+  async getBalance (address: string): Promise<number> {
     try {
-      return await this.db.get(`balance:${address}`);
+      return await this.db.get(`balance:${address}`) as unknown as number;
     } catch (error) {
       if ((error as any).code === 'LEVEL_NOT_FOUND') {
         return 0;
@@ -109,14 +109,14 @@ class LevelBlockchainDB implements BlockchainDB {
     }
   }
 
-  async updateBalance(address: string, amount: number): Promise<void> {
-    await this.db.put(`balance:${address}`, amount);
+  async updateBalance (address: string, amount: number): Promise<void> {
+    await this.db.put(`balance:${address}`, amount as unknown as string);
   }
 }
 
 let dbInstance: BlockchainDB | null = null;
 
-export function getDB(): BlockchainDB {
+export function getDB (): BlockchainDB {
   if (!dbInstance) {
     dbInstance = new LevelBlockchainDB();
   }

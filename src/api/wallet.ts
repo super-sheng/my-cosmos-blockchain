@@ -6,12 +6,12 @@ import { getDB } from '../storage/db';
 const router = express.Router();
 
 // 创建新钱包
-router.post('/create', async (req: Request, res: Response) => {
+router.post('/create', async (_: Request, res: Response) => {
   try {
     const wallet = await createWallet();
     const db = getDB();
     await db.saveWallet(wallet);
-    
+
     // 返回钱包信息，但隐藏私钥和助记词
     res.status(201).json({
       address: wallet.address,
@@ -25,14 +25,15 @@ router.post('/create', async (req: Request, res: Response) => {
 });
 
 // 获取钱包余额
+// @ts-ignore
 router.get('/balance/:address', async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
-    
+
     if (!validateAddress(address)) {
       return res.status(400).json({ error: '无效的钱包地址' });
     }
-    
+
     const balance = await getBalance(address);
     res.json({ address, balance });
   } catch (error) {
@@ -42,21 +43,22 @@ router.get('/balance/:address', async (req: Request, res: Response) => {
 });
 
 // 获取钱包信息
+// @ts-ignore
 router.get('/:address', async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
-    
+
     if (!validateAddress(address)) {
       return res.status(400).json({ error: '无效的钱包地址' });
     }
-    
+
     const db = getDB();
     const wallet = await db.getWallet(address);
-    
+
     if (!wallet) {
       return res.status(404).json({ error: '钱包不存在' });
     }
-    
+
     // 返回钱包信息，但隐藏私钥和助记词
     res.json({
       address: wallet.address,
