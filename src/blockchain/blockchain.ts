@@ -1,6 +1,7 @@
 import { Block, createGenesisBlock, createNewBlock, isValidNewBlock } from '../models/block';
 import { Transaction, TransactionType, createMiningRewardTransaction } from '../models/transaction';
 import { getDB } from '../storage/db';
+import { logger } from '../lib/logger';
 
 // 区块链配置
 const BLOCK_GENERATION_INTERVAL = 10000; // 10秒
@@ -14,15 +15,27 @@ let transactionPool: Transaction[] = [];
 // 初始化区块链
 export async function initBlockchain (): Promise<void> {
   const db = getDB();
-  const lastBlock = await db.getLastBlock();
+  
+  try {
+    // 确保数据库已初始化
+    await db.initialize();
+    
+    const lastBlock = await db.getLastBlock();
 
-  if (!lastBlock) {
-    // 如果不存在区块，创建创世区块
-    const genesisBlock = createGenesisBlock();
-    await db.saveBlock(genesisBlock);
-    console.log('区块链已初始化，创世区块已创建');
-  } else {
-    console.log(`区块链已加载，当前高度: ${lastBlock.index}`);
+    if (!lastBlock) {
+      // 如果不存在区块，创建创世区块
+      const genesisBlock = createGenesisBlock();
+      await db.saveBlock(genesisBlock);
+      logger.info('区块链已初始化，创世区块已创建');
+      console.log('区块链已初始化，创世区块已创建');
+    } else {
+      logger.info(`区块链已加载，当前高度: ${lastBlock.index}`);
+      console.log(`区块链已加载，当前高度: ${lastBlock.index}`);
+    }
+  } catch (error) {
+    logger.error('初始化区块链时发生错误', error);
+    console.error('初始化区块链时发生错误:', error);
+    throw error;
   }
 }
 
