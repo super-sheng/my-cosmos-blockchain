@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { Transaction, TransactionType, createTransactionData } from '../models/transaction';
 import { signTransaction } from '../crypto/signature';
@@ -8,7 +8,7 @@ import { getDB } from '../storage/db';
 const router = express.Router();
 
 // 发送交易
-router.post('/send', async (req, res) => {
+router.post('/send', async (req: Request, res: Response) => {
   try {
     const { from, to, amount, privateKey } = req.body;
     
@@ -73,7 +73,7 @@ router.post('/send', async (req, res) => {
 });
 
 // 获取待处理交易
-router.get('/pending', (req, res) => {
+router.get('/pending', (req: Request, res: Response) => {
   try {
     const transactions = getTransactionPool();
     res.json({ transactions });
@@ -84,7 +84,7 @@ router.get('/pending', (req, res) => {
 });
 
 // 获取交易详情
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const db = getDB();

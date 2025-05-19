@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { createWallet, validateAddress } from '../crypto/wallet';
 import { getBalance } from '../blockchain/blockchain';
 import { getDB } from '../storage/db';
@@ -6,7 +6,7 @@ import { getDB } from '../storage/db';
 const router = express.Router();
 
 // 创建新钱包
-router.post('/create', async (req, res) => {
+router.post('/create', async (req: Request, res: Response) => {
   try {
     const wallet = await createWallet();
     const db = getDB();
@@ -25,7 +25,7 @@ router.post('/create', async (req, res) => {
 });
 
 // 获取钱包余额
-router.get('/balance/:address', async (req, res) => {
+router.get('/balance/:address', async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
     
@@ -42,7 +42,7 @@ router.get('/balance/:address', async (req, res) => {
 });
 
 // 获取钱包信息
-router.get('/:address', async (req, res) => {
+router.get('/:address', async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
     
