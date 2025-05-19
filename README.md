@@ -1,127 +1,259 @@
-# 基于JavaScript的Cosmos区块链
+# My Cosmos Blockchain
 
-这是一个使用JavaScript构建的基于Cosmos生态系统的区块链项目。本项目利用CosmJS库和JavaScript技术栈实现了Cosmos SDK的功能，使您能够创建自己的区块链应用而无需深入Go语言开发。
+一个基于Cosmos SDK的轻量级区块链实现，使用TypeScript开发。支持基本的转账和挖矿功能。
 
-## 项目概述
+## 功能特点
 
-该项目包含一个完整的JavaScript实现的Cosmos区块链应用程序，具有以下功能：
+- 基于Cosmos生态系统
+- 使用TypeScript实现
+- 支持加密货币转账功能
+- 实现简单的PoW挖矿机制
+- REST API接口支持与区块链交互
+- 本地钱包管理
+- 资产管理模块
 
-- 基本的代币转账功能
-- 自定义资产模块
-- 简单的投票治理系统
-- 跨链通信能力（通过IBC协议）
-- 基于JavaScript的智能合约
-
-## 前置条件
-
-在开始之前，请确保您的系统上安装了以下软件：
-
-- [Node.js](https://nodejs.org/) (v16+)
-- [npm](https://www.npmjs.com/) 或 [yarn](https://yarnpkg.com/)
-- [Docker](https://docs.docker.com/get-docker/) (可选，用于容器化部署)
-
-## 快速开始
-
-### 克隆仓库
-
-```bash
-git clone https://github.com/super-sheng/my-cosmos-blockchain.git
-cd my-cosmos-blockchain
-```
-
-### 安装依赖
+## 安装
 
 ```bash
 npm install
-# 或
-yarn install
 ```
 
-### 初始化区块链
+## 开发环境运行
 
 ```bash
-npm run init
-# 或
-yarn init
+npm run dev
 ```
 
-这将初始化您的区块链环境，创建创世账户，并准备启动节点。
-
-### 启动区块链
+## 构建项目
 
 ```bash
-npm run start
-# 或
-yarn start
+npm run build
 ```
 
-这将启动本地区块链节点服务器。
-
-### 与区块链交互
-
-您可以使用内置的CLI工具或REST API与区块链交互：
+## 生产环境运行
 
 ```bash
-# 使用CLI查询账户余额
-npm run cli -- query balance <地址>
+npm start
+```
 
-# 发送代币
-npm run cli -- tx send <发送者地址> <接收者地址> <金额>
+## 运行测试
 
-# 创建资产
-npm run cli -- tx create-asset <名称> <描述> <价格>
+```bash
+npm test
+```
+
+## API接口
+
+### 钱包相关
+
+```
+# 创建新钱包
+POST /api/wallet/create
+
+# 获取钱包余额
+GET /api/wallet/balance/:address
+
+# 获取钱包信息
+GET /api/wallet/:address
+```
+
+### 交易相关
+
+```
+# 发送交易
+POST /api/transaction/send
+Body: {
+  "from": "发送者地址",
+  "to": "接收者地址",
+  "amount": 数量,
+  "privateKey": "发送者私钥"
+}
+
+# 获取待处理交易
+GET /api/transaction/pending
+
+# 获取交易详情
+GET /api/transaction/:id
+```
+
+### 挖矿相关
+
+```
+# 开始挖矿
+POST /api/mining/start
+Body: {
+  "minerAddress": "矿工地址"
+}
+
+# 停止挖矿
+POST /api/mining/stop
+
+# 获取挖矿状态
+GET /api/mining/status
+```
+
+### 区块链相关
+
+```
+# 获取区块链信息
+GET /api/blockchain/info
+
+# 获取所有区块
+GET /api/blockchain/blocks
+
+# 获取特定区块
+GET /api/blockchain/block/:index
+
+# 验证区块链
+GET /api/blockchain/validate
+```
+
+### 资产相关
+
+```
+# 创建新资产
+POST /api/asset
+Body: {
+  "name": "资产名称",
+  "description": "资产描述",
+  "owner": "拥有者地址",
+  "value": 价值,
+  "metadata": {}
+}
+
+# 获取所有资产
+GET /api/asset
+
+# 获取特定资产
+GET /api/asset/:id
+
+# 转移资产所有权
+POST /api/asset/:id/transfer
+Body: {
+  "from": "当前拥有者地址",
+  "to": "新拥有者地址",
+  "privateKey": "当前拥有者私钥"
+}
+
+# 更新资产信息
+PUT /api/asset/:id
+Body: {
+  "name": "新名称",
+  "description": "新描述",
+  "value": 新价值,
+  "metadata": {}
+}
+
+# 删除资产
+DELETE /api/asset/:id
+```
+
+## 使用示例
+
+下面是一个完整的使用流程示例：
+
+### 1. 启动服务
+
+```bash
+npm start
+```
+
+### 2. 创建钱包
+
+```bash
+curl -X POST http://localhost:3000/api/wallet/create
+```
+
+返回例子：
+```json
+{
+  "address": "cosmos1abc123...",
+  "mnemonic": "word1 word2 ...",
+  "publicKey": "abc123..."
+}
+```
+
+记录返回的地址和助记词对应的私钥。
+
+### 3. 开始挖矿以获取初始代币
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"minerAddress":"cosmos1abc123..."}' http://localhost:3000/api/mining/start
+```
+
+### 4. 查看挖矿状态
+
+```bash
+curl http://localhost:3000/api/mining/status
+```
+
+### 5. 等待几分钟后查询余额
+
+```bash
+curl http://localhost:3000/api/wallet/balance/cosmos1abc123...
+```
+
+### 6. 发送交易
+
+先创建另一个钱包作为接收者：
+
+```bash
+curl -X POST http://localhost:3000/api/wallet/create
+```
+
+记录返回的地址，然后发送交易：
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+  "from": "cosmos1abc123...",
+  "to": "cosmos1xyz789...",
+  "amount": 10,
+  "privateKey": "PRIVATE_KEY_..."
+}' http://localhost:3000/api/transaction/send
+```
+
+### 7. 停止挖矿
+
+```bash
+curl -X POST http://localhost:3000/api/mining/stop
+```
+
+### 8. 创建和管理资产
+
+```bash
+# 创建新资产
+curl -X POST -H "Content-Type: application/json" -d '{
+  "name": "My NFT",
+  "description": "A valuable digital asset",
+  "owner": "cosmos1abc123...",
+  "value": 1000,
+  "metadata": {"type": "artwork", "creator": "Artist"}
+}' http://localhost:3000/api/asset
 ```
 
 ## 项目结构
 
 ```
-├── src/                  # 源代码
-│   ├── app/              # 应用程序核心
-│   ├── modules/          # 自定义模块
-│   │   ├── asset/        # 资产管理模块
-│   │   └── voting/       # 投票治理模块
-│   ├── lib/              # 工具库
-│   └── client/           # 客户端工具
-├── config/               # 配置文件
-├── scripts/              # 脚本工具
-└── frontend/             # 前端界面（可选）
+src/
+├── api/          # API接口定义
+├── blockchain/   # 区块链核心功能
+├── crypto/       # 加密相关功能
+├── lib/          # 通用库和工具
+├── mining/       # 挖矿相关功能
+├── models/       # 数据模型
+├── modules/      # 功能模块
+│   └── asset/   # 资产管理模块
+├── storage/      # 数据存储
+├── __tests__/    # 测试文件
+└── index.ts      # 应用入口
 ```
 
-## 自定义您的区块链
+## 注意事项
 
-### 添加新模块
-
-您可以通过创建新的模块来扩展区块链功能：
-
-1. 在`src/modules/`目录下创建新模块文件夹
-2. 实现模块的查询和交易处理逻辑
-3. 在应用程序主文件中注册新模块
-
-### 修改共识参数
-
-您可以在`config/config.json`中修改区块链的共识参数和网络设置。
-
-## 部署到测试网
-
-```bash
-# 构建应用程序
-npm run build
-
-# 初始化节点
-npm run init-testnet -- <节点名称>
-
-# 启动测试网节点
-npm run start-testnet
-```
-
-## 与Cosmos生态系统集成
-
-本项目可以与Cosmos生态系统中的其他区块链进行互操作，使用IBC协议进行跨链通信。
-
-## 贡献
-
-欢迎提交问题和拉取请求！
+- 这是一个演示项目，不建议用于生产环境
+- 私钥处理简化，实际应用中需要更安全的机制
+- 项目使用LevelDB作为本地存储，实际应用可能需要更复杂的数据库
 
 ## 许可证
 
-MIT
+[MIT](LICENSE)
