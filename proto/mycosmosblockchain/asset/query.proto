@@ -1,0 +1,54 @@
+syntax = "proto3";
+package mycosmosblockchain.asset;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "mycosmosblockchain/asset/tx.proto";
+
+option go_package = "github.com/super-sheng/my-cosmos-blockchain/x/asset/types";
+
+// 资产查询服务定义
+service Query {
+  // 获取单个资产详情
+  rpc Asset(QueryAssetRequest) returns (QueryAssetResponse) {
+    option (google.api.http).get = "/super-sheng/my-cosmos-blockchain/asset/assets/{id}";
+  }
+  
+  // 获取资产列表
+  rpc Assets(QueryAssetsRequest) returns (QueryAssetsResponse) {
+    option (google.api.http).get = "/super-sheng/my-cosmos-blockchain/asset/assets";
+  }
+  
+  // 根据所有者查询资产
+  rpc AssetsByOwner(QueryAssetsByOwnerRequest) returns (QueryAssetsResponse) {
+    option (google.api.http).get = "/super-sheng/my-cosmos-blockchain/asset/assets/owner/{owner}";
+  }
+}
+
+// 查询单个资产的请求
+message QueryAssetRequest {
+  string id = 1;
+}
+
+// 查询单个资产的响应
+message QueryAssetResponse {
+  Asset asset = 1;
+}
+
+// 查询资产列表的请求
+message QueryAssetsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// 查询资产列表的响应
+message QueryAssetsResponse {
+  repeated Asset assets = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// 根据所有者查询资产的请求
+message QueryAssetsByOwnerRequest {
+  string owner = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
